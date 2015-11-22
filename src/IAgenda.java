@@ -7,7 +7,7 @@ public interface IAgenda {
 	public void visualizarDiaSemana(int diaSemana);
 	public void visualizarData(int ano, int mes, int dia);
 	public void novoCompromisso(String descr, int ano, int mes, int dia,
-	int hora, int min, String[] partic) throws AgendaException;
+	int hora, int min, int duracao, String[] partic) throws AgendaException;
 	public void salvar() throws IOException;
 
 }
