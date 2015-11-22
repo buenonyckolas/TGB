@@ -1,8 +1,12 @@
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.io.*;
 
 public class Agenda implements IAgenda {
 	
+	DateFormat df = new SimpleDateFormat("dd/MM");
 	
 	public Agenda() {
 		
@@ -33,7 +37,11 @@ public class Agenda implements IAgenda {
 	}
 	
 	public void visualizarSemana() {
-		
+		Calendar calendar = Calendar.getInstance();
+		calendar.setFirstDayOfWeek(calendar.SUNDAY);
+		int diaSemana = calendar.get(Calendar.DAY_OF_WEEK);
+		calendar.add(Calendar.DAY_OF_MONTH, Calendar.SUNDAY - diaSemana);
+		System.out.println(df.format(calendar.getTime()));
 	}
 	
 	public void visualizarDiaSemana(int diaSemana) {

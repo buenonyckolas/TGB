@@ -6,7 +6,7 @@ public class Teste {
 	
 		
 		Agenda a = new Agenda();
-		a.carregarAgenda("C:\\bryan@hotmail.com");
+		a.visualizarSemana();
 
 	}
 
