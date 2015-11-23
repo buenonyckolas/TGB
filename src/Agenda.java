@@ -15,7 +15,7 @@ public class Agenda implements IAgenda {
 	}
 
 	public void carregarAgenda(String emailUsuario) throws IOException {
-		try {
+		try { 
 			FileReader fr = new FileReader(emailUsuario + ".txt");
 			BufferedReader in = new BufferedReader(fr);
 			String line = in.readLine();
