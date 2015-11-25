@@ -13,15 +13,15 @@ public class Agenda implements IAgenda {
 	private String path;
 	LinkedList<String> DiaSemana = new LinkedList<String>(); // Lista encadeada
 	String line; // Array que percorre arquivo recebendo valor do split
-	
+
 	public Agenda() {
 
 	}
-	
+
 	public void abrirAgenda() throws IOException {
 		int op = 0;
 		Scanner ler = new Scanner(System.in);
-		while(op == 0) {
+		while (op != 0) {
 			System.out.println("1 - Carregar Agenda");
 			System.out.println("2 - Visualizar Semana");
 			System.out.println("3 - Visualizar Dia da Semana");
@@ -30,69 +30,132 @@ public class Agenda implements IAgenda {
 			System.out.println("6 - Cancela Compromisso");
 			System.out.println("7 - Salva Agenda");
 			System.out.println("0 -  Sair");
-		
+
 			// Lê a opção selecionada pelo usuário
 			System.out.print("Digite a opção: ");
 			op = ler.nextInt();
 		}
-		
-		switch(op) { // Switch para administrar a opção escolhida pelo usuário
-		
-			case 1: // Opção de Carregar
-				System.out.println("Insira o nome do usuário: ");
-				try {
-					carregarAgenda(ler.nextLine()); 
+
+		switch (op) { // Switch para administrar a opção escolhida pelo usuário
+
+		case 1: // Opção de Carregar
+			System.out.println("Insira o nome do usuário: ");
+			try {
+				carregarAgenda(ler.nextLine());
+			} catch (FileNotFoundException e) {
+				System.out.println("Você informou um nome inválido!");
+			}
+			System.out.println("Carregou.");
+			abrirAgenda();
+			break;
+		case 2:
+			visualizarSemana();
+			abrirAgenda();
+			break;
+		case 3:
+			visualizarDiaSemana(ler.nextInt()); //método não está feito
+			abrirAgenda();
+			break;
+		case 4:
+			System.out.println("Ano:");
+			int ano = ler.nextInt();
+			
+			System.out.println("Mês:");
+			int mes = ler.nextInt();
+			
+			System.out.println("Dia:");
+			int dia = ler.nextInt();
+			
+			visualizarData(ano, mes, dia);
+			abrirAgenda();
+			break;
+		case 5:
+			System.out.println("Descrição:");
+			String desc = ler.nextLine();
+			System.out.println("Ano:");
+			int ano2 = ler.nextInt();
+			System.out.println("Mês:");
+			int mes2 = ler.nextInt();
+			System.out.println("Dia:");
+			int dia2 = ler.nextInt();
+			System.out.println("Digite a hora de início e, após, os minutos:");
+			int hora = ler.nextInt();
+			int min = ler.nextInt();
+			System.out.println("Duração em minutos:");
+			int duracao = ler.nextInt();
+			System.out.println("Digite o número de paticipantes (Use 0 se não houver nenhum):");
+			String partic[];
+			int aux;
+			if((aux = ler.nextInt()) == 0){
+				partic = null;
+			}else{
+				partic = new String[aux];
+				for(int i = 0; i < partic.length; i++){
+					System.out.println("Nome do "+aux+"º participante:");
+					partic[i] = ler.nextLine();
 				}
-				catch(FileNotFoundException e) {
-					System.out.println("Você informou um nome inválido!");
-				}
-				System.out.println("Carregou.");
-				break;
-			case 2:
-				
-		
-			default:
-				System.out.println("Você selecionou uma oção inválida.");
-				break;
+			}
+			novoCompromisso(desc, ano2, mes2, dia2, hora, min, duracao, partic);
+			abrirAgenda();
+		case 6:
+			System.out.println("Ano:");
+			int ano3 = ler.nextInt();
+			System.out.println("Mes:");
+			int mes3 = ler.nextInt();
+			System.out.println("Dia:");
+			int dia3 = ler.nextInt();
+			System.out.println("Horas seguidas de minutos de início do evento que desejas cancelar:");
+			int inicio = ler.nextInt();
+			int minInicio = ler.nextInt();
+			
+			cancelarCompromisso(ano3, mes3, dia3, inicio, minInicio); //não feito
+			abrirAgenda();
+		case 7:
+			salvar(); //não feito
+			abrirAgenda();
+		default:
+			System.out.println("Você selecionou uma oção inválida. Tente novamente.");
+			abrirAgenda();
+			break;
 		}
-		
+
 	}
 
 	public void carregarAgenda(String emailUsuario) throws IOException {
 		setPath(emailUsuario); // Deixa caminho do arquivo/email global
-		try { 
-			FileReader fr = new FileReader("C:\\TGB\\"+emailUsuario + ".txt");
+		try {
+			FileReader fr = new FileReader("C:\\TGB\\" + emailUsuario + ".txt");
 			BufferedReader in = new BufferedReader(fr);
-			//String line = in.readLine();
-			
-			//while (in.ready() == true) {
-				//line = in.readLine().split(":");
-			
-				/*for(int i = 0; i < line.length; i++) {
-					if(line[i].equals("--")) { // verifica quando termina o compromisso daquele dia pelo separador "--"
-						DiaSemana.add(line[i+1]); // Se tiver, pega próxima linha
-					}
-					
-					DiaSemana.add(line[i]); // Adiciona na lista, porém precisa pegar somente a data
+			// String line = in.readLine();
+
+			// while (in.ready() == true) {
+			// line = in.readLine().split(":");
+
+			/*
+			 * for(int i = 0; i < line.length; i++) { if(line[i].equals("--")) {
+			 * // verifica quando termina o compromisso daquele dia pelo
+			 * separador "--" DiaSemana.add(line[i+1]); // Se tiver, pega
+			 * próxima linha }
+			 * 
+			 * DiaSemana.add(line[i]); // Adiciona na lista, porém precisa pegar
+			 * somente a data }
+			 */
+
+			String strData[] = null;
+			while ((line = in.readLine()) != null) {
+				if (line.contains("data")) {
+					strData = line.split(":");
+					System.out.println(line);
 				}
-				*/
-			
-				String strData[] = null;
-				while ((line = in.readLine()) != null) {
-					if(line.contains("data")) {
-						strData = line.split(":");
-						System.out.println(line);
-					}
-				}
-				
-				for(int i =0; i < strData.length; i++) {
-					System.out.println(strData[i]);
-				}
-				
+			}
+
+			for (int i = 0; i < strData.length; i++) {
+				System.out.println(strData[i]);
+			}
 
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo não encontrado. Criaremos um para você =) ");
-			File f = new File("C:\\TGB\\"+emailUsuario+".txt");
+			File f = new File("C:\\TGB\\" + emailUsuario + ".txt");
 			f.createNewFile();
 		} catch (IOException e) {
 			System.out.println("Erro ao ler arquivo.");
@@ -104,21 +167,34 @@ public class Agenda implements IAgenda {
 		// Método incompleto. Precisa ainda adicionar a verificação de
 		// compromissos nos dias.
 		getPrimeiroDiaDaSemana();
-		//Pls arranja um jeito de inserir essa data abaixo dentro do for, se tu for ver ela é o primeiro dia da semana.
+		// Pls arranja um jeito de inserir essa data abaixo dentro do for, se tu
+		// for ver ela é o primeiro dia da semana.
 		System.out.printf(df.format(calendar.getTime()));
 		for (int i = 0; i < 6; i++) {
 			calendar.add(calendar.DAY_OF_MONTH, 1);
 			System.out.printf(" || " + df.format(calendar.getTime()));
-			if(procuraCompromisso(df2.format(calendar.getTime())) == 0){ //exibindo o número de ocorrências, pelo menos é pra exibir HUAEHUA testa aí
+			if (procuraCompromisso(df2.format(calendar.getTime())) == 0) { // exibindo
+																			// o
+																			// número
+																			// de
+																			// ocorrências,
+																			// pelo
+																			// menos
+																			// é
+																			// pra
+																			// exibir
+																			// HUAEHUA
+																			// testa
+																			// aí
 				System.out.println(" ");
-			}else{
+			} else {
 				System.out.println(procuraCompromisso(df2.format(calendar.getTime())));
-			} 
+			}
 		}
 	}
-	
-	public int procuraCompromisso(String date) { //método adicional
-		//Pls testa a trata as exceções.
+
+	public int procuraCompromisso(String date) { // método adicional
+		// Pls testa a trata as exceções.
 		String line = " ";
 		int contCompromissos = 0;
 		try {
@@ -127,7 +203,7 @@ public class Agenda implements IAgenda {
 				if (line.contains(date)) {
 					contCompromissos++;
 				}
-				
+
 			}
 		} catch (IOException e) {
 
@@ -142,58 +218,20 @@ public class Agenda implements IAgenda {
 		calendar.add(Calendar.DAY_OF_MONTH, Calendar.SUNDAY - diaSemana);
 	}
 
-	public void visualizarDiaSemana(String diaSemana) {
-		// Pensei em um switch pelo fato de ser String; Talvez seja necessário
-		// um método auxiliar;
-		switch (diaSemana) {
-		case "Domingo":
-			break;
-		case "Segunda":
-			break;
-		case "Terça":
-			break;
-		case "Quarta":
-			break;
-		case "Quinta":
-			break;
-		case "Sexta":
-			break;
-		case "Sábado":
-			break;
-		default:
-			System.out.println("Escreva o nome do dia corretamente");
-			break;
-		}
-
-	}
-
 	public void visualizarData(int ano, int mes, int dia) {
 
-		/*String line = " ";
-		String lineAnterior = " ";
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(path));
-			while ((line = in.readLine()) != null) {
-				if (line.contains(df3.format(ano + "-" + mes + "-" + dia))) {
-					lineAnterior = line;
-					System.out.println(lineAnterior);
-				}
-				if (line.contains("inicio:")) {
-					System.out.println(line);
-				}
-				if (line.contains("duracao:")) { 
-					System.out.println(line);
-				}
-				if (line.contains("participantes:")) {
-					System.out.println(line);
-					System.out.println("- - - - -");
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		*/
-		
+		/*
+		 * String line = " "; String lineAnterior = " "; try { BufferedReader in
+		 * = new BufferedReader(new FileReader(path)); while ((line =
+		 * in.readLine()) != null) { if (line.contains(df3.format(ano + "-" +
+		 * mes + "-" + dia))) { lineAnterior = line;
+		 * System.out.println(lineAnterior); } if (line.contains("inicio:")) {
+		 * System.out.println(line); } if (line.contains("duracao:")) {
+		 * System.out.println(line); } if (line.contains("participantes:")) {
+		 * System.out.println(line); System.out.println("- - - - -"); } } }
+		 * catch (IOException e) { e.printStackTrace(); }
+		 */
+
 	}
 
 	public void novoCompromisso(String descr, int ano, int mes, int dia, int hora, int min, int duracao,
@@ -202,15 +240,15 @@ public class Agenda implements IAgenda {
 		// alterações necessárias.
 		if (procuraCompromisso(ano, mes, dia, hora, min)) {
 			System.out.println("Já tem um compromisso agendado nessa data/horário");
-			return;
+			novoCompromisso(descr, ano, mes, dia, hora, min, duracao, partic);
 		}
 		if (!(hora >= 8) || !(hora <= 19)) {
 			System.out.println("O horário do compromisso precisa estar entre 8h e 19h");
-			return;
+			novoCompromisso(descr, ano, mes, dia, hora, min, duracao, partic);
 		}
 		if (!(100 % min == 0)) {
 			System.out.println("Campo minutos inválido");
-			return;
+			novoCompromisso(descr, ano, mes, dia, hora, min, duracao, partic);
 		}
 		try {
 			FileWriter arqv = new FileWriter(path);
@@ -248,7 +286,10 @@ public class Agenda implements IAgenda {
 
 	}
 
-	public void setPath(String path) { // método adicional criado para manter o usuário "logado", podendo trabalhar com o login do cliente em outros métodos.
+	public void setPath(String path) { // método adicional criado para manter o
+										// usuário "logado", podendo trabalhar
+										// com o login do cliente em outros
+										// métodos.
 		this.path = path;
 	}
 
@@ -256,15 +297,12 @@ public class Agenda implements IAgenda {
 
 	}
 
-
-	public void cancelarCompromisso(int dia, int mes, int ano, String inicio) {
+	public void cancelarCompromisso(int dia, int mes, int ano, int hora, int min) { //adicionei um parâmetro para aproveitar o método adicional "procuraCompromisso"
 		visualizarData(dia, mes, ano);
 	}
 
 	public void visualizarDiaSemana(int diaSemana) {
-		
-		
-		
+
 	}
 
 }
