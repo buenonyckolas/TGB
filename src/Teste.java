@@ -17,6 +17,9 @@ public class Teste {
 		System.out.print("Digite o nome arquivo: ");
 		agenda.carregarAgenda(ler.nextLine());
 		
+		
+		agenda.visualizarData(2015, 03, 30);
+		
 		//agenda.visualizarSemana();
 		
 	}

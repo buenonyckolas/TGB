@@ -9,10 +9,11 @@ public class Agenda implements IAgenda {
 
 	DateFormat df = new SimpleDateFormat("dd/MM");
 	DateFormat df2 = new SimpleDateFormat("MM-dd");
+	DateFormat df3 = new SimpleDateFormat("YYYY-MM-dd");
 	Calendar calendar = Calendar.getInstance();
 	private String path;
-	LinkedList<String> DiaSemana = new LinkedList<String>(); // Lista encadeada
-	String line; // Array que percorre arquivo recebendo valor do split
+	LinkedList<String> Dias = new LinkedList<String>(); // Lista encadeada
+	//String line; // String que percorre arquivo recebendo valor do split
 
 	public Agenda() {
 
@@ -118,6 +119,7 @@ public class Agenda implements IAgenda {
 			abrirAgenda();
 			break;
 		}
+		ler.close();
 
 	}
 
@@ -126,7 +128,7 @@ public class Agenda implements IAgenda {
 		try {
 			FileReader fr = new FileReader("C:\\TGB\\" + emailUsuario + ".txt");
 			BufferedReader in = new BufferedReader(fr);
-			// String line = in.readLine();
+			String line;
 
 			// while (in.ready() == true) {
 			// line = in.readLine().split(":");
@@ -141,18 +143,19 @@ public class Agenda implements IAgenda {
 			 * somente a data }
 			 */
 
-			String strData[] = null;
+			/* String strData[] = null;
 			while ((line = in.readLine()) != null) {
 				if (line.contains("data")) {
-					strData = line.split(":");
-					System.out.println(line);
+					strData = line.split("-");
+					//System.out.println(line);
 				}
 			}
-
+			
 			for (int i = 0; i < strData.length; i++) {
 				System.out.println(strData[i]);
 			}
-
+			*/
+			in.close();
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo não encontrado. Criaremos um para você =) ");
 			File f = new File("C:\\TGB\\" + emailUsuario + ".txt");
@@ -160,32 +163,17 @@ public class Agenda implements IAgenda {
 		} catch (IOException e) {
 			System.out.println("Erro ao ler arquivo.");
 		}
-
 	}
 
 	public void visualizarSemana() {
 		// Método incompleto. Precisa ainda adicionar a verificação de
 		// compromissos nos dias.
 		getPrimeiroDiaDaSemana();
-		// Pls arranja um jeito de inserir essa data abaixo dentro do for, se tu
-		// for ver ela é o primeiro dia da semana.
 		System.out.printf(df.format(calendar.getTime()));
 		for (int i = 0; i < 6; i++) {
 			calendar.add(calendar.DAY_OF_MONTH, 1);
 			System.out.printf(" || " + df.format(calendar.getTime()));
-			if (procuraCompromisso(df2.format(calendar.getTime())) == 0) { // exibindo
-																			// o
-																			// número
-																			// de
-																			// ocorrências,
-																			// pelo
-																			// menos
-																			// é
-																			// pra
-																			// exibir
-																			// HUAEHUA
-																			// testa
-																			// aí
+			if (procuraCompromisso(df2.format(calendar.getTime())) == 0) { 
 				System.out.println(" ");
 			} else {
 				System.out.println(procuraCompromisso(df2.format(calendar.getTime())));
@@ -205,6 +193,7 @@ public class Agenda implements IAgenda {
 				}
 
 			}
+			in.close();
 		} catch (IOException e) {
 
 			e.printStackTrace();
@@ -220,24 +209,42 @@ public class Agenda implements IAgenda {
 
 	public void visualizarData(int ano, int mes, int dia) {
 
-		/*
-		 * String line = " "; String lineAnterior = " "; try { BufferedReader in
-		 * = new BufferedReader(new FileReader(path)); while ((line =
-		 * in.readLine()) != null) { if (line.contains(df3.format(ano + "-" +
-		 * mes + "-" + dia))) { lineAnterior = line;
-		 * System.out.println(lineAnterior); } if (line.contains("inicio:")) {
-		 * System.out.println(line); } if (line.contains("duracao:")) {
-		 * System.out.println(line); } if (line.contains("participantes:")) {
-		 * System.out.println(line); System.out.println("- - - - -"); } } }
-		 * catch (IOException e) { e.printStackTrace(); }
-		 */
+		
+		String line = " ";
+		String lineAnterior = " ";
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(path));
+			while ((line = in.readLine()) != null) {
+				String[] s= line.split(":");
+				for(int i = 0; i < s.length; i++) {
+					//System.out.println(s[i].toString().trim());
+					if (s[i].toString().trim().equals(ano+"-"+0+mes+"-"+dia)) {
+						lineAnterior = line;
+						System.out.println(lineAnterior);
+						
+					}
+				}
+				if (line.contains("inicio:")) {
+					//System.out.println(line);
+				}
+				if (line.contains("duracao:")) {
+					//System.out.println(line);
+				}
+				if (line.contains("participantes:")) {
+					//System.out.println(line);
+					//System.out.println("- - - - -");
+				}
+			}
+			in.close();
 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	public void novoCompromisso(String descr, int ano, int mes, int dia, int hora, int min, int duracao,
 			String[] partic) throws AgendaException {
-		// Testa e trata as exceções pra mim depois pls. Obs: Pode fazer as
-		// alterações necessárias.
 		if (procuraCompromisso(ano, mes, dia, hora, min)) {
 			System.out.println("Já tem um compromisso agendado nessa data/horário");
 			novoCompromisso(descr, ano, mes, dia, hora, min, duracao, partic);
@@ -256,15 +263,14 @@ public class Agenda implements IAgenda {
 			System.out.println("- -");
 			gravarArqv.println("descrição: " + descr + "\ndata: " + ano + "-" + mes + "-" + dia + "\ninicio: " + hora
 					+ ":" + min + "\nduracao: " + duracao + " minutos" + "\nparticipantes: " + partic);
+			gravarArqv.close();
 		} catch (IOException e) {
 
 			e.printStackTrace();
 		}
 	}
 
-	public boolean procuraCompromisso(int ano, int mes, int dia, int hora, int min) { // método
-																						// adicional
-		// testa e trata as exceção pra mim depois pls. Vlw.
+	public boolean procuraCompromisso(int ano, int mes, int dia, int hora, int min) { // Método Adiciona
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(path));
 			String line = " ";
@@ -275,6 +281,7 @@ public class Agenda implements IAgenda {
 						return true;
 					}
 				}
+				in.close();
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -285,12 +292,9 @@ public class Agenda implements IAgenda {
 		return false;
 
 	}
-
-	public void setPath(String path) { // método adicional criado para manter o
-										// usuário "logado", podendo trabalhar
-										// com o login do cliente em outros
-										// métodos.
-		this.path = path;
+	
+	public void setPath(String path) { // método adicional criado para manter o usuário "logado", podendo trabalhar com o login do cliente em outros métodos.
+		this.path = "C:\\TGB\\" + path + ".txt";
 	}
 
 	public void salvar() throws IOException {
@@ -305,4 +309,4 @@ public class Agenda implements IAgenda {
 
 	}
 
-}
+} 
