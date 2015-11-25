@@ -1,6 +1,8 @@
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.Scanner;
 import java.io.*;
 
 public class Agenda implements IAgenda {
@@ -9,21 +11,85 @@ public class Agenda implements IAgenda {
 	DateFormat df2 = new SimpleDateFormat("MM-dd");
 	Calendar calendar = Calendar.getInstance();
 	private String path;
-
+	LinkedList<String> DiaSemana = new LinkedList<String>(); // Lista encadeada
+	String line; // Array que percorre arquivo recebendo valor do split
+	
 	public Agenda() {
 
 	}
+	
+	public void abrirAgenda() throws IOException {
+		int op = 0;
+		Scanner ler = new Scanner(System.in);
+		while(op == 0) {
+			System.out.println("1 - Carregar Agenda");
+			System.out.println("2 - Visualizar Semana");
+			System.out.println("3 - Visualizar Dia da Semana");
+			System.out.println("4 - Visualizar Data");
+			System.out.println("5 - Cadastrar Novo Compromisso");
+			System.out.println("6 - Cancela Compromisso");
+			System.out.println("7 - Salva Agenda");
+			System.out.println("0 -  Sair");
+		
+			// Lê a opção selecionada pelo usuário
+			System.out.print("Digite a opção: ");
+			op = ler.nextInt();
+		}
+		
+		switch(op) { // Switch para administrar a opção escolhida pelo usuário
+		
+			case 1: // Opção de Carregar
+				System.out.println("Insira o nome do usuário: ");
+				try {
+					carregarAgenda(ler.nextLine()); 
+				}
+				catch(FileNotFoundException e) {
+					System.out.println("Você informou um nome inválido!");
+				}
+				System.out.println("Carregou.");
+				break;
+			case 2:
+				
+		
+			default:
+				System.out.println("Você selecionou uma oção inválida.");
+				break;
+		}
+		
+	}
 
 	public void carregarAgenda(String emailUsuario) throws IOException {
-		setPath(emailUsuario);
+		setPath(emailUsuario); // Deixa caminho do arquivo/email global
 		try { 
 			FileReader fr = new FileReader("C:\\TGB\\"+emailUsuario + ".txt");
 			BufferedReader in = new BufferedReader(fr);
-			String line = in.readLine();
-			while (line != null) {
-				System.out.println(line);
-				line = in.readLine();
-			}
+			//String line = in.readLine();
+			
+			//while (in.ready() == true) {
+				//line = in.readLine().split(":");
+			
+				/*for(int i = 0; i < line.length; i++) {
+					if(line[i].equals("--")) { // verifica quando termina o compromisso daquele dia pelo separador "--"
+						DiaSemana.add(line[i+1]); // Se tiver, pega próxima linha
+					}
+					
+					DiaSemana.add(line[i]); // Adiciona na lista, porém precisa pegar somente a data
+				}
+				*/
+			
+				String strData[] = null;
+				while ((line = in.readLine()) != null) {
+					if(line.contains("data")) {
+						strData = line.split(":");
+						System.out.println(line);
+					}
+				}
+				
+				for(int i =0; i < strData.length; i++) {
+					System.out.println(strData[i]);
+				}
+				
+
 		} catch (FileNotFoundException e) {
 			System.out.println("Arquivo não encontrado. Criaremos um para você =) ");
 			File f = new File("C:\\TGB\\"+emailUsuario+".txt");
@@ -47,7 +113,7 @@ public class Agenda implements IAgenda {
 				System.out.println(" ");
 			}else{
 				System.out.println(procuraCompromisso(df2.format(calendar.getTime())));
-			}
+			} 
 		}
 	}
 	
@@ -61,6 +127,7 @@ public class Agenda implements IAgenda {
 				if (line.contains(date)) {
 					contCompromissos++;
 				}
+				
 			}
 		} catch (IOException e) {
 
@@ -102,6 +169,31 @@ public class Agenda implements IAgenda {
 
 	public void visualizarData(int ano, int mes, int dia) {
 
+		/*String line = " ";
+		String lineAnterior = " ";
+		try {
+			BufferedReader in = new BufferedReader(new FileReader(path));
+			while ((line = in.readLine()) != null) {
+				if (line.contains(df3.format(ano + "-" + mes + "-" + dia))) {
+					lineAnterior = line;
+					System.out.println(lineAnterior);
+				}
+				if (line.contains("inicio:")) {
+					System.out.println(line);
+				}
+				if (line.contains("duracao:")) { 
+					System.out.println(line);
+				}
+				if (line.contains("participantes:")) {
+					System.out.println(line);
+					System.out.println("- - - - -");
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		*/
+		
 	}
 
 	public void novoCompromisso(String descr, int ano, int mes, int dia, int hora, int min, int duracao,
@@ -156,7 +248,7 @@ public class Agenda implements IAgenda {
 
 	}
 
-	public void setPath(String path) { // método adicional
+	public void setPath(String path) { // método adicional criado para manter o usuário "logado", podendo trabalhar com o login do cliente em outros métodos.
 		this.path = path;
 	}
 
@@ -164,13 +256,14 @@ public class Agenda implements IAgenda {
 
 	}
 
-	// Método louco
 
 	public void cancelarCompromisso(int dia, int mes, int ano, String inicio) {
 		visualizarData(dia, mes, ano);
 	}
 
 	public void visualizarDiaSemana(int diaSemana) {
+		
+		
 		
 	}
 
