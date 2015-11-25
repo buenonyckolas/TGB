@@ -15,21 +15,19 @@ public class Agenda implements IAgenda {
 	}
 
 	public void carregarAgenda(String emailUsuario) throws IOException {
+		setPath(emailUsuario);
 		try { 
-			FileReader fr = new FileReader(emailUsuario + ".txt");
+			FileReader fr = new FileReader("C:\\TGB\\"+emailUsuario + ".txt");
 			BufferedReader in = new BufferedReader(fr);
 			String line = in.readLine();
 			while (line != null) {
 				System.out.println(line);
 				line = in.readLine();
 			}
-			String txt[] = line.split("/");
-			for (int i = 0; i < txt.length; i++) {
-				System.out.println(txt[i]);
-			}
-			in.close();
 		} catch (FileNotFoundException e) {
-			System.out.println("Arquivo não encontrado.");
+			System.out.println("Arquivo não encontrado. Criaremos um para você =) ");
+			File f = new File("C:\\TGB\\"+emailUsuario+".txt");
+			f.createNewFile();
 		} catch (IOException e) {
 			System.out.println("Erro ao ler arquivo.");
 		}
@@ -173,7 +171,7 @@ public class Agenda implements IAgenda {
 	}
 
 	public void visualizarDiaSemana(int diaSemana) {
-
+		
 	}
 
 }
